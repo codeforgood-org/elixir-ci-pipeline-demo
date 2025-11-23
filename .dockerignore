@@ -1,0 +1,57 @@
+# Git files
+.git
+.gitignore
+
+# Mix artifacts
+/_build
+/deps
+*.ez
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Editor and IDE files
+.elixir_ls/
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Documentation
+/doc
+
+# Test files
+/test
+/cover
+/coverage
+coveralls.json
+
+# Static artifacts (will be built in container)
+/priv/static/
+
+# Node modules
+/assets/node_modules/
+
+# Database files
+*.db
+*.db-shm
+*.db-wal
+
+# OS files
+.DS_Store
+
+# CI/CD
+.github
+
+# Docker files
+docker-compose.yml
+Dockerfile
+.dockerignore
+
+# Misc
+/tmp
+README.md
+LICENSE

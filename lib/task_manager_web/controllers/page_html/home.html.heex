@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-50">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="csrf-token" content={get_csrf_token()} />
+    <title>Task Manager - Phoenix CI/CD Demo</title>
+    <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
+    <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
+    </script>
+  </head>
+  <body class="h-full">
+    <div class="min-h-full">
+      <nav class="bg-indigo-600">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div class="flex h-16 items-center justify-between">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <h1 class="text-white text-2xl font-bold">Task Manager</h1>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <header class="bg-white shadow">
+        <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+          <h1 class="text-3xl font-bold tracking-tight text-gray-900">
+            Welcome to Task Manager
+          </h1>
+        </div>
+      </header>
+
+      <main>
+        <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
+          <div class="px-4 py-6 sm:px-0">
+            <div class="rounded-lg border-4 border-dashed border-gray-200 p-8">
+              <div class="text-center">
+                <h2 class="text-2xl font-semibold text-gray-900 mb-4">
+                  Phoenix CI/CD Pipeline Demo
+                </h2>
+                <p class="text-gray-600 mb-6">
+                  This is a production-ready Phoenix application demonstrating CI/CD best practices
+                  with GitHub Actions, comprehensive testing, and code coverage.
+                </p>
+
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 mt-8">
+                  <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                      <h3 class="text-lg font-medium text-gray-900">RESTful API</h3>
+                      <p class="mt-2 text-sm text-gray-500">
+                        Full CRUD operations for task management at <code class="bg-gray-100 px-2 py-1 rounded">/api/tasks</code>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                      <h3 class="text-lg font-medium text-gray-900">GitHub Actions</h3>
+                      <p class="mt-2 text-sm text-gray-500">
+                        Automated CI/CD pipeline with tests, coverage, and code quality checks
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                      <h3 class="text-lg font-medium text-gray-900">Code Quality</h3>
+                      <p class="mt-2 text-sm text-gray-500">
+                        Credo for style, Dialyzer for types, Sobelow for security
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                      <h3 class="text-lg font-medium text-gray-900">Test Coverage</h3>
+                      <p class="mt-2 text-sm text-gray-500">
+                        Comprehensive test suite with ExCoveralls coverage reporting
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                      <h3 class="text-lg font-medium text-gray-900">Docker Ready</h3>
+                      <p class="mt-2 text-sm text-gray-500">
+                        Containerized deployment with Docker and docker-compose
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="bg-white overflow-hidden shadow rounded-lg">
+                    <div class="px-4 py-5 sm:p-6">
+                      <h3 class="text-lg font-medium text-gray-900">Production Config</h3>
+                      <p class="mt-2 text-sm text-gray-500">
+                        Release configuration with proper secrets management
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="mt-8">
+                  <a
+                    href="/api/tasks"
+                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  >
+                    View API Documentation
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

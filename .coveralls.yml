@@ -1,0 +1,12 @@
+# Coverage configuration for Coveralls
+# https://docs.coveralls.io/
+
+# Paths to skip during coverage analysis
+skip_files:
+  - test
+  - deps
+
+# Coverage thresholds
+coverage_options:
+  treat_no_relevant_lines_as_covered: true
+  minimum_coverage: 80
