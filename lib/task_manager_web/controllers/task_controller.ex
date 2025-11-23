@@ -8,11 +8,30 @@ defmodule TaskManagerWeb.TaskController do
 
   @doc """
   GET /api/tasks
-  Lists all tasks.
+  Lists all tasks with pagination, filtering, and search.
+
+  Query parameters:
+  - page: Page number (default: 1)
+  - page_size: Items per page (default: 20, max: 100)
+  - status: Filter by status (todo, in_progress, done)
+  - priority: Filter by priority (low, medium, high)
+  - search: Search in title and description
+  - sort_by: Field to sort by (id, title, status, priority, due_date, inserted_at, updated_at)
+  - sort_order: Sort order (asc, desc)
+  - overdue: Filter overdue tasks (true/false)
   """
-  def index(conn, _params) do
-    tasks = Tasks.list_tasks()
-    render(conn, :index, tasks: tasks)
+  def index(conn, params) do
+    pagination = Tasks.list_tasks_paginated(params)
+    render(conn, :index, pagination)
+  end
+
+  @doc """
+  GET /api/tasks/statistics
+  Returns task statistics.
+  """
+  def statistics(conn, _params) do
+    stats = Tasks.get_task_statistics()
+    render(conn, :statistics, stats: stats)
   end
 
   @doc """

@@ -12,26 +12,30 @@ defmodule TaskManagerWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug TaskManagerWeb.Plugs.RateLimiter, limit: 100, window_seconds: 60
   end
 
   scope "/", TaskManagerWeb do
     pipe_through :browser
 
     get "/", PageController, :home
+    live "/dashboard", DashboardLive
   end
 
-  # Health check routes (no authentication required)
+  # Health check and metrics routes (no authentication required)
   scope "/", TaskManagerWeb do
     pipe_through :api
 
     get "/health", HealthController, :index
     get "/health/detailed", HealthController, :detailed
+    get "/metrics", MetricsController, :index
   end
 
   # API routes
   scope "/api", TaskManagerWeb do
     pipe_through :api
 
+    get "/tasks/statistics", TaskController, :statistics
     resources "/tasks", TaskController, except: [:new, :edit]
   end
 

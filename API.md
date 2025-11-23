@@ -270,3 +270,170 @@ This demo API does not implement authentication. For production use, consider ad
 ## CORS
 
 CORS is not configured by default. If you need to access this API from a web browser, you'll need to configure CORS in your Phoenix application.
+
+## Advanced Features
+
+### Pagination
+
+All list endpoints support pagination:
+
+```bash
+curl "http://localhost:4000/api/tasks?page=1&page_size=20"
+```
+
+Response includes pagination metadata:
+```json
+{
+  "data": [...],
+  "pagination": {
+    "total": 100,
+    "page": 1,
+    "page_size": 20,
+    "total_pages": 5
+  }
+}
+```
+
+### Filtering
+
+Filter tasks by status or priority:
+
+```bash
+# Filter by status
+curl "http://localhost:4000/api/tasks?status=in_progress"
+
+# Filter by priority
+curl "http://localhost:4000/api/tasks?priority=high"
+
+# Filter overdue tasks
+curl "http://localhost:4000/api/tasks?overdue=true"
+
+# Combine filters
+curl "http://localhost:4000/api/tasks?status=todo&priority=high"
+```
+
+### Search
+
+Search in task titles and descriptions:
+
+```bash
+curl "http://localhost:4000/api/tasks?search=documentation"
+```
+
+### Sorting
+
+Sort by any field in ascending or descending order:
+
+```bash
+# Sort by due date ascending
+curl "http://localhost:4000/api/tasks?sort_by=due_date&sort_order=asc"
+
+# Sort by priority descending
+curl "http://localhost:4000/api/tasks?sort_by=priority&sort_order=desc"
+```
+
+Valid sort fields: `id`, `title`, `status`, `priority`, `due_date`, `inserted_at`, `updated_at`
+
+### Task Statistics
+
+Get aggregated task statistics:
+
+**Request:**
+```bash
+curl http://localhost:4000/api/tasks/statistics
+```
+
+**Response:**
+```json
+{
+  "data": {
+    "total": 42,
+    "by_status": {
+      "todo": 10,
+      "in_progress": 15,
+      "done": 17
+    },
+    "by_priority": {
+      "low": 12,
+      "medium": 20,
+      "high": 10
+    },
+    "overdue": 5
+  }
+}
+```
+
+## Monitoring Endpoints
+
+### Health Check
+
+Simple health check:
+```bash
+curl http://localhost:4000/health
+```
+
+Detailed health check with database status:
+```bash
+curl http://localhost:4000/health/detailed
+```
+
+### Prometheus Metrics
+
+Get metrics in Prometheus format:
+```bash
+curl http://localhost:4000/metrics
+```
+
+## Rate Limiting
+
+The API implements rate limiting:
+- **Limit**: 100 requests per minute per IP address
+- **Headers**: Each response includes rate limit headers
+
+```
+X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 95
+X-RateLimit-Reset: 1234567890
+```
+
+When rate limit is exceeded, you'll receive a `429 Too Many Requests` response.
+
+## OpenAPI Specification
+
+Full OpenAPI 3.0 specification available at `openapi.yaml`.
+
+View it with Swagger UI or import into Postman for interactive API exploration.
+
+## Real-Time Dashboard
+
+Visit `http://localhost:4000/dashboard` for a real-time task dashboard with:
+- Live statistics
+- Recent tasks
+- Auto-refresh every 5 seconds
+
+## Complete Example
+
+Create and manage tasks with advanced features:
+
+```bash
+# Create multiple tasks
+curl -X POST http://localhost:4000/api/tasks \
+  -H "Content-Type: application/json" \
+  -d '{"task": {"title": "High priority task", "priority": "high", "status": "todo"}}'
+
+curl -X POST http://localhost:4000/api/tasks \
+  -H "Content-Type: application/json" \
+  -d '{"task": {"title": "In progress task", "priority": "medium", "status": "in_progress"}}'
+
+# Get high priority tasks, sorted by due date
+curl "http://localhost:4000/api/tasks?priority=high&sort_by=due_date&sort_order=asc"
+
+# Search for specific tasks
+curl "http://localhost:4000/api/tasks?search=priority"
+
+# Get statistics
+curl http://localhost:4000/api/tasks/statistics
+
+# Check rate limit status
+curl -I http://localhost:4000/api/tasks | grep RateLimit
+```

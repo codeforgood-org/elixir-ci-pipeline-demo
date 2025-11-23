@@ -1,0 +1,513 @@
+openapi: 3.0.3
+info:
+  title: Task Manager API
+  description: |
+    Production-ready RESTful API for task management with filtering, pagination,
+    and real-time statistics.
+
+    ## Features
+    - Full CRUD operations for tasks
+    - Advanced filtering and search
+    - Pagination support
+    - Task statistics and analytics
+    - Rate limiting (100 requests/minute)
+    - Health checks and metrics
+
+  version: 0.1.0
+  contact:
+    name: Task Manager Support
+    url: https://github.com/codeforgood-org/elixir-ci-pipeline-demo
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:4000
+    description: Development server
+  - url: https://taskmanager.example.com
+    description: Production server
+
+tags:
+  - name: tasks
+    description: Task management operations
+  - name: statistics
+    description: Analytics and statistics
+  - name: health
+    description: Health checks and monitoring
+
+paths:
+  /api/tasks:
+    get:
+      tags: [tasks]
+      summary: List all tasks
+      description: |
+        Returns a paginated list of tasks with optional filtering and sorting.
+
+        Supports filtering by status, priority, search term, and due date.
+      operationId: listTasks
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/PageSizeParam'
+        - $ref: '#/components/parameters/StatusParam'
+        - $ref: '#/components/parameters/PriorityParam'
+        - $ref: '#/components/parameters/SearchParam'
+        - $ref: '#/components/parameters/SortByParam'
+        - $ref: '#/components/parameters/SortOrderParam'
+        - $ref: '#/components/parameters/OverdueParam'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskListResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
+    post:
+      tags: [tasks]
+      summary: Create a new task
+      operationId: createTask
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskInput'
+      responses:
+        '201':
+          description: Task created successfully
+          headers:
+            Location:
+              schema:
+                type: string
+              description: URL of the created task
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+
+  /api/tasks/{id}:
+    get:
+      tags: [tasks]
+      summary: Get a task by ID
+      operationId: getTask
+      parameters:
+        - $ref: '#/components/parameters/TaskIdParam'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [tasks]
+      summary: Update a task
+      operationId: updateTask
+      parameters:
+        - $ref: '#/components/parameters/TaskIdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskInput'
+      responses:
+        '200':
+          description: Task updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+    delete:
+      tags: [tasks]
+      summary: Delete a task
+      operationId: deleteTask
+      parameters:
+        - $ref: '#/components/parameters/TaskIdParam'
+      responses:
+        '204':
+          description: Task deleted successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /api/tasks/statistics:
+    get:
+      tags: [statistics]
+      summary: Get task statistics
+      description: Returns aggregated statistics about tasks
+      operationId: getStatistics
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatisticsResponse'
+
+  /health:
+    get:
+      tags: [health]
+      summary: Simple health check
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /health/detailed:
+    get:
+      tags: [health]
+      summary: Detailed health check
+      description: Returns detailed health information including database connectivity
+      operationId: detailedHealthCheck
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailedHealthResponse'
+        '503':
+          description: Service is unhealthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetailedHealthResponse'
+
+  /metrics:
+    get:
+      tags: [health]
+      summary: Prometheus metrics
+      description: Returns metrics in Prometheus format
+      operationId: getMetrics
+      responses:
+        '200':
+          description: Metrics data
+          content:
+            text/plain:
+              schema:
+                type: string
+
+components:
+  parameters:
+    TaskIdParam:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Task ID
+
+    PageParam:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+      description: Page number
+
+    PageSizeParam:
+      name: page_size
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+      description: Number of items per page
+
+    StatusParam:
+      name: status
+      in: query
+      schema:
+        type: string
+        enum: [todo, in_progress, done]
+      description: Filter by status
+
+    PriorityParam:
+      name: priority
+      in: query
+      schema:
+        type: string
+        enum: [low, medium, high]
+      description: Filter by priority
+
+    SearchParam:
+      name: search
+      in: query
+      schema:
+        type: string
+      description: Search in title and description
+
+    SortByParam:
+      name: sort_by
+      in: query
+      schema:
+        type: string
+        enum: [id, title, status, priority, due_date, inserted_at, updated_at]
+        default: inserted_at
+      description: Field to sort by
+
+    SortOrderParam:
+      name: sort_order
+      in: query
+      schema:
+        type: string
+        enum: [asc, desc]
+        default: desc
+      description: Sort order
+
+    OverdueParam:
+      name: overdue
+      in: query
+      schema:
+        type: boolean
+      description: Filter overdue tasks
+
+  schemas:
+    Task:
+      type: object
+      required: [id, title, status, priority]
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          minLength: 1
+          maxLength: 255
+          example: "Complete project documentation"
+        description:
+          type: string
+          maxLength: 1000
+          nullable: true
+          example: "Write comprehensive API documentation"
+        status:
+          type: string
+          enum: [todo, in_progress, done]
+          default: todo
+          example: "in_progress"
+        priority:
+          type: string
+          enum: [low, medium, high]
+          default: medium
+          example: "high"
+        due_date:
+          type: string
+          format: date
+          nullable: true
+          example: "2024-12-31"
+        inserted_at:
+          type: string
+          format: date-time
+          example: "2024-01-01T00:00:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2024-01-01T12:00:00Z"
+
+    TaskInput:
+      type: object
+      required: [task]
+      properties:
+        task:
+          type: object
+          required: [title]
+          properties:
+            title:
+              type: string
+              minLength: 1
+              maxLength: 255
+            description:
+              type: string
+              maxLength: 1000
+            status:
+              type: string
+              enum: [todo, in_progress, done]
+            priority:
+              type: string
+              enum: [low, medium, high]
+            due_date:
+              type: string
+              format: date
+
+    TaskResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/Task'
+
+    TaskListResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Task'
+        pagination:
+          type: object
+          properties:
+            total:
+              type: integer
+              example: 42
+            page:
+              type: integer
+              example: 1
+            page_size:
+              type: integer
+              example: 20
+            total_pages:
+              type: integer
+              example: 3
+
+    StatisticsResponse:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            total:
+              type: integer
+              example: 42
+            by_status:
+              type: object
+              properties:
+                todo:
+                  type: integer
+                  example: 10
+                in_progress:
+                  type: integer
+                  example: 15
+                done:
+                  type: integer
+                  example: 17
+            by_priority:
+              type: object
+              properties:
+                low:
+                  type: integer
+                  example: 12
+                medium:
+                  type: integer
+                  example: 20
+                high:
+                  type: integer
+                  example: 10
+            overdue:
+              type: integer
+              example: 5
+
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "healthy"
+        service:
+          type: string
+          example: "task_manager"
+        timestamp:
+          type: string
+          format: date-time
+
+    DetailedHealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "healthy"
+        service:
+          type: string
+          example: "task_manager"
+        timestamp:
+          type: string
+          format: date-time
+        checks:
+          type: object
+          properties:
+            database:
+              type: string
+              enum: [ok, error]
+            application:
+              type: string
+              enum: [ok, error]
+        version:
+          type: string
+          example: "0.1.0"
+
+    Error:
+      type: object
+      properties:
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+
+  responses:
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errors:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: "Not Found"
+
+    ValidationError:
+      description: Validation error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    TooManyRequests:
+      description: Rate limit exceeded
+      headers:
+        X-RateLimit-Limit:
+          schema:
+            type: integer
+          description: Request limit per window
+        X-RateLimit-Remaining:
+          schema:
+            type: integer
+          description: Remaining requests in current window
+        X-RateLimit-Reset:
+          schema:
+            type: integer
+          description: Unix timestamp when the rate limit resets
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              errors:
+                type: object
+                properties:
+                  detail:
+                    type: string
+                    example: "Too Many Requests"
